@@ -12,20 +12,31 @@ public static class ResourceMapper
         _converters[typeof(T)] = converter;
     }
 
-    public static T Map<T>(ResourceSection section)
+    public static T Map<T>(ResourceFile file, ResourceSection section)
         where T : class, new()
     {
-        // check if a custom converter exists
+        return MapInternal<T>(file, section.Values);
+    }
+
+    public static T Map<T>(ResourceFile file, SubResource subResource)
+        where T : class, new()
+    {
+        return MapInternal<T>(file, subResource.Values);
+    }
+
+    private static T MapInternal<T>(ResourceFile file, IReadOnlyDictionary<string, Variant> values)
+        where T : class, new()
+    {
+        // check for custom converter
         if (
             _converters.TryGetValue(typeof(T), out object? converter)
             && converter is IResourceConverter<T> typedConverter
         )
         {
-            return typedConverter.Convert(section);
+            return typedConverter.Convert(values);
         }
 
-        // fallback to auto reflection-based mapping
-        // TODO: fix reflection warnings
+        // reflection-based mapping
         T instance = new();
         PropertyInfo[] properties = typeof(T).GetProperties(
             BindingFlags.Public | BindingFlags.Instance
@@ -47,27 +58,41 @@ public static class ResourceMapper
 
             foreach (string key in possibleKeys)
             {
-                if (section.TryGetValue(key, out Variant? variant))
+                if (values.TryGetValue(key, out Variant? variant))
                 {
-                    try
-                    {
-                        prop.SetValue(instance, variant.Value);
-                    }
-                    catch
-                    {
-                        // fallback to the internal Variant.Get logic for type conversion
-                        MethodInfo? method = typeof(Variant)
-                            .GetMethod("Get")
-                            ?.MakeGenericMethod(prop.PropertyType);
-                        object? convertedValue = method?.Invoke(variant, null);
-                        prop.SetValue(instance, convertedValue);
-                    }
+                    prop.SetValue(instance, ResolveValue(file, variant, prop.PropertyType));
                     break;
                 }
             }
         }
 
         return instance;
+    }
+
+    private static object? ResolveValue(ResourceFile file, Variant variant, Type targetType)
+    {
+        object? rawValue = variant.Value;
+
+        if (rawValue is SubResourceReference subRef)
+        {
+            SubResource? subData = file.GetSubResource(subRef.Id);
+            if (subData != null)
+            {
+                MethodInfo? method = typeof(ResourceMapper)
+                    .GetMethod("MapInternal", BindingFlags.NonPublic | BindingFlags.Static)
+                    ?.MakeGenericMethod(targetType);
+                return method?.Invoke(null, [file, subData.Values]);
+            }
+        }
+
+        if (rawValue is ExtResourceReference extRef)
+        {
+            // Here I need ResourceLoader to load the external path
+            // then map it. For now, just return the reference or null
+            return rawValue;
+        }
+
+        return variant.Get(targetType);
     }
 
     private static string ToSnakeCase(string text)

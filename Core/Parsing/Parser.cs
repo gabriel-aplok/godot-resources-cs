@@ -62,10 +62,45 @@ public sealed class Parser(List<Token> tokens)
         {
             file.ExternalResources.Add(ParseExternalResource());
         }
+        else if (sectionName == "sub_resource")
+        {
+            file.SubResources.Add(ParseSubResource());
+        }
         else
         {
             ParseGenericSection(file, sectionName);
         }
+    }
+
+    private SubResource ParseSubResource()
+    {
+        SubResource sub = new();
+
+        while (Current.Type != TokenType.RightBracket)
+        {
+            string key = Expect(TokenType.Identifier).Text;
+            Expect(TokenType.Equals);
+            Variant value = ParseValue();
+
+            if (key == "type")
+            {
+                sub.Type = value.Get<string>();
+            }
+            else if (key == "id")
+            {
+                sub.Id = value.Get<string>();
+            }
+        }
+        Expect(TokenType.RightBracket);
+
+        while (Current.Type == TokenType.Identifier)
+        {
+            string key = Consume().Text;
+            Expect(TokenType.Equals);
+            sub[key] = ParseValue();
+        }
+
+        return sub;
     }
 
     private void ParseHeader(ResourceFile file)

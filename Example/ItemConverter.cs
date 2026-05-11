@@ -4,14 +4,14 @@ namespace GodotResources.Example;
 
 public class ItemConverter : IResourceConverter<ItemData>
 {
-    public ItemData Convert(ResourceSection section)
+    public ItemData Convert(IReadOnlyDictionary<string, Variant> values)
     {
         return new ItemData
         {
-            Name = section.Get<string>("name").ToUpper(),
-            Damage = section.Get<int>("damage") + 10,
-            IsTool = section.Get<bool>("is_tool"),
-            Tags = section.Get<List<object>>("tags"),
+            Name = values["name"].Get<string>().ToUpper(),
+            Damage = values["damage"].Get<int>() + 10,
+            IsTool = values["is_tool"].Get<bool>(),
+            Tags = values["tags"].Get<List<object>>(),
         };
     }
 }

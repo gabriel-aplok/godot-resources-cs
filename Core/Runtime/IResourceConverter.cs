@@ -4,7 +4,6 @@ namespace GodotResources.Core.Runtime;
 /// Defines a custom conversion logic from a ResourceSection to a typed object.
 /// </summary>
 public interface IResourceConverter<T>
-    where T : class, new()
 {
-    public T Convert(ResourceSection section);
+    public T Convert(IReadOnlyDictionary<string, Variant> values);
 }

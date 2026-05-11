@@ -6,7 +6,7 @@
         <LangVersion>12.0</LangVersion>
         <RootNamespace>GodotResources</RootNamespace>
         <AssemblyName>GodotResources</AssemblyName>
-        <NoWarn>CS1591</NoWarn>
+        <NoWarn>CS1591;IL2067;IL3050</NoWarn>
 
         <!-- compilation -->
         <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
