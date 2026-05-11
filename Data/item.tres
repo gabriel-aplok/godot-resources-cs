@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://item123"]
+
+[ext_resource type="Texture2D" uid="uid://texture123" path="res://icon.svg" id="1_tex"]
+
+[resource]
+name = "Sword"
+damage = 15
+weight = 1.25
+is_tool = true
+icon = ExtResource("1_tex")
+material = SubResource("1_material")
+tags = ["weapon", "melee"]
+
+[sub_resource]
+id = "1_material"
+shader = "res://shaders/sword.shader"
+metallic = 0.85
+roughness = 0.2

@@ -1,0 +1,127 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <!-- application -->
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <LangVersion>12.0</LangVersion>
+        <RootNamespace>GodotResources</RootNamespace>
+        <AssemblyName>GodotResources</AssemblyName>
+        <NoWarn>CS1591</NoWarn>
+
+        <!-- compilation -->
+        <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+
+        <!-- build -->
+        <Configurations>Debug;Release</Configurations>
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <Deterministic>true</Deterministic>
+        <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+
+        <!-- performance -->
+        <Optimize>true</Optimize>
+        <TieredCompilation>true</TieredCompilation>
+        <TieredPGO>true</TieredPGO>
+        <ReadyToRun>true</ReadyToRun>
+
+        <!-- trimming -->
+        <PublishTrimmed>true</PublishTrimmed>
+        <TrimMode>partial</TrimMode>
+        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+
+        <!-- aot -->
+        <PublishAot>true</PublishAot>
+        <IsAotCompatible>true</IsAotCompatible>
+
+        <!-- globalization -->
+        <InvariantGlobalization>true</InvariantGlobalization>
+
+        <!-- analyzers -->
+        <EnableNETAnalyzers>true</EnableNETAnalyzers>
+        <AnalysisLevel>latest</AnalysisLevel>
+        <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+
+        <!-- debug -->
+        <DebugType>portable</DebugType>
+        <DebugSymbols>true</DebugSymbols>
+
+        <!-- package generation -->
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+
+        <!-- nuget metadata -->
+        <PackageId>GodotResources</PackageId>
+        <Title>GodotResources</Title>
+        <Description>
+      godot-inspired c# resource system with lexer, parser, serializer,
+      runtime model, and .tres-style resource support.
+    </Description>
+
+        <Authors>gabriel-aplok</Authors>
+        <Company>FireWave Interactive</Company>
+
+        <PackageProjectUrl>
+      https://github.com/gabriel-aplok/godot-resources-cs
+    </PackageProjectUrl>
+
+        <RepositoryUrl>
+      https://github.com/gabriel-aplok/godot-resources-cs
+    </RepositoryUrl>
+
+        <RepositoryType>git</RepositoryType>
+
+        <PackageTags>
+      godot;resource-system;parser;serializer;game-engine;
+      lexer;runtime;asset-pipeline;tres;res
+    </PackageTags>
+
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+
+        <PackageReleaseNotes>
+      initial release
+    </PackageReleaseNotes>
+
+        <!-- symbols -->
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+        <!-- xml docs -->
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+        <!-- source link -->
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    </PropertyGroup>
+
+    <!-- release-only aggressive optimizations -->
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <Optimize>true</Optimize>
+        <DebugType>none</DebugType>
+        <DebuggerSupport>false</DebuggerSupport>
+        <EventSourceSupport>false</EventSourceSupport>
+        <MetadataUpdaterSupport>false</MetadataUpdaterSupport>
+        <StackTraceSupport>true</StackTraceSupport>
+        <UseSystemResourceKeys>true</UseSystemResourceKeys>
+    </PropertyGroup>
+
+    <!-- example resources -->
+    <ItemGroup>
+        <Content Include="Data/**/*">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+
+        <None Include="README.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+    <!-- source link -->
+    <ItemGroup>
+        <PackageReference
+            Include="Microsoft.SourceLink.GitHub"
+            Version="10.0.203"
+            PrivateAssets="all"
+        />
+    </ItemGroup>
+</Project>
