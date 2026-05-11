@@ -11,7 +11,7 @@ public static class ResourceSaver
     {
         ResourceWriter writer = new();
 
-        string text = writer.Write(file);
+        string text = ResourceWriter.Write(file);
 
         File.WriteAllText(path, text);
     }

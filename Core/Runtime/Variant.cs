@@ -2,16 +2,14 @@ using System.Collections;
 
 namespace GodotResources.Core.Runtime;
 
-/// <summary>
-/// Represents a generic resource value.
-/// </summary>
 public sealed class Variant(object? value)
 {
     public object? Value { get; set; } = value;
 
     public T Get<T>()
     {
-        return (T)Get(typeof(T))!;
+        object? result = Get(typeof(T));
+        return result == null ? default! : (T)result;
     }
 
     public object? Get(Type targetType)
@@ -35,7 +33,6 @@ public sealed class Variant(object? value)
             {
                 Type[] args = targetType.GetGenericArguments();
                 IDictionary newDict = (IDictionary)Activator.CreateInstance(targetType)!;
-
                 foreach (DictionaryEntry entry in dict)
                 {
                     object? key =
@@ -43,7 +40,6 @@ public sealed class Variant(object? value)
                             ? vKey.Get(args[0])
                             : Convert.ChangeType(entry.Key, args[0]);
                     object? val = (entry.Value is Variant vVal) ? vVal.Get(args[1]) : entry.Value;
-
                     newDict.Add(key!, val);
                 }
                 return newDict;
@@ -58,9 +54,12 @@ public sealed class Variant(object? value)
 
             foreach (object? item in enumerable)
             {
-                list.Add(Convert.ChangeType(item, elementType));
+                object? convertedItem =
+                    (item is Variant v)
+                        ? v.Get(elementType)
+                        : Convert.ChangeType(item, elementType);
+                list.Add(convertedItem);
             }
-
             return list;
         }
 

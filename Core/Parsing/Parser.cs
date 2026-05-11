@@ -97,9 +97,21 @@ public sealed class Parser(List<Token> tokens)
         {
             string key = Consume().Text;
             Expect(TokenType.Equals);
-            sub[key] = ParseValue();
-        }
+            Variant value = ParseValue();
 
+            if (key == "id")
+            {
+                sub.Id = value.Get<string>();
+            }
+            else if (key == "type")
+            {
+                sub.Type = value.Get<string>();
+            }
+            else
+            {
+                sub[key] = value;
+            }
+        }
         return sub;
     }
 

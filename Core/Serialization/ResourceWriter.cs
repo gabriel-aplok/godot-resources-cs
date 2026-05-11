@@ -9,42 +9,54 @@ namespace GodotResources.Core.Serialization;
 /// </summary>
 public sealed class ResourceWriter
 {
-    public string Write(ResourceFile file)
+    public static string Write(ResourceFile file)
     {
         StringBuilder sb = new();
 
+        // header
         sb.Append($"[gd_resource type=\"{file.ResourceType}\" ");
-
         if (!string.IsNullOrEmpty(file.ScriptClass))
         {
             sb.Append($"script_class=\"{file.ScriptClass}\" ");
         }
 
         sb.AppendLine($"format={file.FormatVersion} uid=\"{file.Uid}\"]");
-
         sb.AppendLine();
 
+        // external resources
         foreach (ExternalResource ext in file.ExternalResources)
         {
             sb.AppendLine(
-                $"[ext_resource type=\"{ext.Type}\" "
-                    + $"uid=\"{ext.Uid}\" "
-                    + $"path=\"{ext.Path}\" "
-                    + $"id=\"{ext.Id}\"]"
+                $"[ext_resource type=\"{ext.Type}\" uid=\"{ext.Uid}\" path=\"{ext.Path}\" id=\"{ext.Id}\"]"
             );
+            sb.AppendLine();
+        }
 
+        // sub resources
+        foreach (SubResource sub in file.SubResources)
+        {
+            sb.Append("[sub_resource ");
+            if (!string.IsNullOrEmpty(sub.Type))
+            {
+                sb.Append($"type=\"{sub.Type}\" ");
+            }
+
+            sb.AppendLine($"id=\"{sub.Id}\"]");
+
+            foreach (KeyValuePair<string, Variant> pair in sub.Values)
+            {
+                sb.AppendLine($"{pair.Key} = {WriteVariant(pair.Value.Value)}");
+            }
             sb.AppendLine();
         }
 
         foreach (ResourceSection section in file.Sections)
         {
             sb.AppendLine($"[{section.Name}]");
-
             foreach (KeyValuePair<string, Variant> pair in section.Values)
             {
                 sb.AppendLine($"{pair.Key} = {WriteVariant(pair.Value.Value)}");
             }
-
             sb.AppendLine();
         }
 
