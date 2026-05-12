@@ -1,4 +1,6 @@
-﻿using GodotResources.Core.IO;
+﻿using System.Collections;
+using GodotResources.Core;
+using GodotResources.Core.IO;
 using GodotResources.Core.Runtime;
 using GodotResources.Core.Utilities;
 
@@ -8,18 +10,18 @@ public static class Test2
 {
     public static void Start()
     {
-        Console.WriteLine("==== Example 1 ====");
+        Logger.Info("Example 1");
         ResourceMapper.RegisterConverter(new ItemConverter());
         ResourceFile file = ResourceLoader.Load("Data/item.tres");
         ItemData sword = ResourceMapper.Map<ItemData>(file, file.Resource);
-        Console.WriteLine($"Name: {sword.Name}");
-        Console.WriteLine($"Damage: {sword.Damage}");
-        Console.WriteLine($"IsTool: {sword.IsTool}");
+        Logger.Info($"Name: {sword.Name}");
+        Logger.Info($"Damage: {sword.Damage}");
+        Logger.Info($"IsTool: {sword.IsTool}");
 
-        Console.WriteLine("==== Example 2 ====");
+        Logger.Info("Example 2");
         SimpleResLoad();
 
-        Console.WriteLine("==== Example 3 ====");
+        Logger.Info("Example 3");
         ComplexCRUD();
     }
 
@@ -33,12 +35,12 @@ public static class Test2
         bool is_tool = file.Resource.Get<bool>("is_tool");
         List<object> tags = file.Resource.Get<List<object>>("tags");
 
-        Console.WriteLine($"Loaded Item:");
-        Console.WriteLine($"Name: {name}");
-        Console.WriteLine($"Damage: {damage}");
-        Console.WriteLine($"Weight: {weight}");
-        Console.WriteLine($"IsTool: {is_tool}");
-        Console.WriteLine($"Tags: {string.Join(", ", tags)}");
+        Logger.Info($"Loaded Item:");
+        Logger.Info($"Name: {name}");
+        Logger.Info($"Damage: {damage}");
+        Logger.Info($"Weight: {weight}");
+        Logger.Info($"IsTool: {is_tool}");
+        Logger.Info($"Tags: {string.Join(", ", tags)}");
 
         // Modify values
         file.Resource["damage"] = new Variant(25);
@@ -49,7 +51,7 @@ public static class Test2
         // Save
         ResourceSaver.Save(file, "Data/item_modified.tres");
 
-        Console.WriteLine("Saved modified resource.");
+        Logger.Info("Saved modified resource.");
     }
 
     private static void ComplexCRUD()
@@ -168,7 +170,7 @@ public static class Test2
 
         // save file
         ResourceSaver.Save(file, "Data/complete_item.tres");
-        Console.WriteLine("resource saved successfully.");
+        Logger.Info("resource saved successfully.");
 
         // load it again
         ResourceFile loaded = ResourceLoader.Load("Data/complete_item.tres");
@@ -179,22 +181,22 @@ public static class Test2
         float crit = loaded.Resource.Get<float>("crit_chance");
         bool is_tool = loaded.Resource.Get<bool>("is_tool");
 
-        Console.WriteLine($"name: {itemName}");
-        Console.WriteLine($"damage: {damage}");
-        Console.WriteLine($"crit: {crit}");
-        Console.WriteLine($"is_tool: {is_tool}");
+        Logger.Info($"name: {itemName}");
+        Logger.Info($"damage: {damage}");
+        Logger.Info($"crit: {crit}");
+        Logger.Info($"is_tool: {is_tool}");
 
         // read array values
         List<object> tags = loaded.Resource.Get<List<object>>("tags");
-        Console.WriteLine($"tags: {string.Join(", ", tags)}");
+        Logger.Info($"tags: {string.Join(", ", tags)}");
 
         // read nested array values
         List<object> spawnPoints = loaded.Resource.Get<List<object>>("spawn_points");
-        Console.WriteLine($"spawn_points: {string.Join(", ", spawnPoints)}");
+        Logger.Info($"spawn_points: {FormatValue(spawnPoints)}");
 
         // read multiline text
         string lore = loaded.Resource.Get<string>("lore");
-        Console.WriteLine($"lore: {lore}");
+        Logger.Info($"lore: {lore}");
 
         // modify values after loading
         loaded.Resource["tags"] = new Variant(new List<object> { "a", "b", "c", "d" });
@@ -203,6 +205,25 @@ public static class Test2
 
         // save modified file
         ResourceSaver.Save(loaded, "Data/complete_item_modified.tres");
-        Console.WriteLine("modified resource saved.");
+        Logger.Info("modified resource saved.");
+    }
+
+    private static string FormatValue(object? value)
+    {
+        if (value is string str)
+        {
+            return str;
+        }
+
+        if (value is IEnumerable enumerable)
+        {
+            List<string> items = [];
+            foreach (object? item in enumerable)
+            {
+                items.Add(FormatValue(item));
+            }
+            return $"[{string.Join(", ", items)}]";
+        }
+        return value?.ToString() ?? "null";
     }
 }

@@ -77,7 +77,32 @@ public sealed class Variant(object? value)
 
     public override string ToString()
     {
-        return Value?.ToString() ?? "null";
+        return FormatInternal(Value);
+
+        static string FormatInternal(object? obj)
+        {
+            if (obj == null)
+            {
+                return "null";
+            }
+
+            if (obj is string s)
+            {
+                return s;
+            }
+
+            if (obj is IEnumerable en)
+            {
+                List<string> parts = [];
+                foreach (object? item in en)
+                {
+                    parts.Add(item is Variant v ? v.ToString() : FormatInternal(item));
+                }
+
+                return $"[{string.Join(", ", parts)}]";
+            }
+            return obj.ToString() ?? "null";
+        }
     }
 
     public static implicit operator Variant(string value) => new(value);

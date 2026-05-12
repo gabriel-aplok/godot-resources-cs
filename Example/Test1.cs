@@ -1,3 +1,4 @@
+using GodotResources.Core;
 using GodotResources.Core.IO;
 using GodotResources.Core.Runtime;
 using GodotResources.Core.Utilities;
@@ -10,13 +11,13 @@ public static class Test1
     {
         ResourceMapper.RegisterConverter(new ItemConverter());
 
-        Console.WriteLine("==== Example 1: Mapping with Converter ====");
+        Logger.Info("Example 1: Mapping with Converter");
         MappingWithConverter();
 
-        Console.WriteLine("\n==== Example 2: Manual Access and Modification ====");
+        Logger.Info("\nExample 2: Manual Access and Modification");
         ManualAccessAndSave();
 
-        Console.WriteLine("\n==== Example 3: Complex CRUD and Sub-resources ====");
+        Logger.Info("\nExample 3: Complex CRUD and Sub-resources");
         ComplexResourceCreation();
     }
 
@@ -25,9 +26,9 @@ public static class Test1
         ResourceFile file = ResourceLoader.Load("Data/item.tres");
         ItemData sword = ResourceMapper.Map<ItemData>(file, file.Resource);
 
-        Console.WriteLine($"Name: {sword.Name}");
-        Console.WriteLine($"Damage: {sword.Damage}");
-        Console.WriteLine($"Is Tool: {sword.IsTool}");
+        Logger.Info($"Name: {sword.Name}");
+        Logger.Info($"Damage: {sword.Damage}");
+        Logger.Info($"Is Tool: {sword.IsTool}");
     }
 
     private static void ManualAccessAndSave()
@@ -38,15 +39,15 @@ public static class Test1
         int damage = file.Resource.Get<int>("damage");
         List<object> tags = file.Resource.Get<List<object>>("tags");
 
-        Console.WriteLine($"Name: {name}");
-        Console.WriteLine($"Damage: {damage}");
-        Console.WriteLine($"Tags: {string.Join(", ", tags)}");
+        Logger.Info($"Name: {name}");
+        Logger.Info($"Damage: {damage}");
+        Logger.Info($"Tags: {string.Join(", ", tags)}");
 
         file.Resource["damage"] = new Variant(150);
         file.Resource["tags"] = new Variant(new List<object> { "legendary", "fire" });
 
         ResourceSaver.Save(file, "Data/item_upgraded.tres");
-        Console.WriteLine("File 'item_upgraded.tres' saved successfully.");
+        Logger.Info("File 'item_upgraded.tres' saved successfully.");
     }
 
     private static void ComplexResourceCreation()
@@ -93,13 +94,11 @@ public static class Test1
         ResourceSaver.Save(file, "Data/complex_item.tres");
 
         ResourceFile loaded = ResourceLoader.Load("Data/complex_item.tres");
-        Console.WriteLine(
-            $"Complex resource saved and reloaded: {loaded.Resource.Get<string>("name")}"
-        );
+        Logger.Info($"Complex resource saved and reloaded: {loaded.Resource.Get<string>("name")}");
 
         Dictionary<string, object> metadata = loaded.Resource.Get<Dictionary<string, object>>(
             "metadata"
         );
-        Console.WriteLine($"Tier: {metadata["tier"]}");
+        Logger.Info($"Tier: {metadata["tier"]}");
     }
 }
